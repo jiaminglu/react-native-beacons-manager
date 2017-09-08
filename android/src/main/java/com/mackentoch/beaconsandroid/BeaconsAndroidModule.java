@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -34,7 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements BeaconConsumer {
+public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements BeaconConsumer, LifecycleEventListener {
     private static final String LOG_TAG = "BeaconsAndroidModule";
     private static final int RUNNING_AVG_RSSI_FILTER = 0;
     private static final int ARMA_RSSI_FILTER = 1;
@@ -51,6 +52,7 @@ public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements 
         // Detect iBeacons ( http://stackoverflow.com/questions/25027983/is-this-the-correct-layout-to-detect-ibeacons-with-altbeacons-android-beacon-li )
         addParser("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24");
         mBeaconManager.bind(this);
+        reactContext.addLifecycleEventListener(this);
     }
 
     @Override
@@ -347,5 +349,23 @@ public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements 
           major.length() > 0 ? Identifier.parse(major) : null,
           minor.length() > 0 ? Identifier.parse(minor) : null
         );
+    }
+
+    /***********************************************************************************************
+     * Life Cycle Callbacks
+     **********************************************************************************************/
+    @Override
+    public void onHostResume() {
+
+    }
+
+    @Override
+    public void onHostPause() {
+
+    }
+
+    @Override
+    public void onHostDestroy() {
+        mBeaconManager.unbind(this);
     }
 }
